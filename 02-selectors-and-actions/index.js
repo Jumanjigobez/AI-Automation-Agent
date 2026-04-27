@@ -5,14 +5,24 @@ const {chromium} = require("playwright");
     const browser = await chromium.launch({headless: true}),
           page = await browser.newPage();
 
-    await page.goto("http://www.google.com");
+    await page.goto("https://books.toscrape.com");
 
-    await page.waitForSelector('textarea[name="q"]');
+    
+    console.log("website Opened...")
 
-    await page.fill("textarea[name='q']", "Juma Chaje");
+    // await page.keyboard.press("Enter");
 
-    await page.keyboard.press("Enter");
+    await page.waitForLoadState("networkidle");
 
+    await page.waitForSelector("h3");
+
+    await page.locator("h3").first().click(); //click the first h3 title book element
+
+    const firstBookTitle = await page.locator("h1").first().innerText(); //get the h1 book title
+
+    console.log("Book Title:", firstBookTitle);
+
+     
     await browser.close();
 
 })();
