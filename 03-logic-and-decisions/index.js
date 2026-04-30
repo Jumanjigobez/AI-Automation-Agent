@@ -9,16 +9,37 @@ const {chromium} = require("playwright");
     //We want to check for a book "When we collided" and get it's price, else click button next until book found
 
     let bookFound = false;
+        
 
     while(!bookFound){
-        const bookName = await page.locator("h3").allInnerTexts(); //comes in an array form
+        const books = await page.locator(".product_pod"), //comes in an array form
+              count  = await books.count();
 
-        if(bookName.includes("When We Collided")){
-            console.log("Book Found 😁");
-            bookFound = true;
-            break;
+        for(var i=0; i<count; i++){
+            let book = books.nth(i);
+
+            const title = await book.locator("h3 a").getAttribute("title");
+
+             if(title == "When We Collided"){
+                
+                const price = await book.locator(".price_color").innerText(),
+                      buyLink = await book.locator("h3 a").getAttribute("href"),//get the relative href link
+                      fullLink = new URL(buyLink, page.url()).href; //concat with full website url to have a working url
+
+                console.log("Book Found 😁");
+                console.log("Price: ", price);
+                console.log("Buy Now: ", fullLink);
+                
+                bookFound = true;
+
+                break;
+            }
         }
 
+        if(bookFound) break;
+        
+       
+        
         //finding the next page button
         const NextBtn = await page.locator(".next a").count();
 
@@ -32,6 +53,8 @@ const {chromium} = require("playwright");
             break;
         }
     }
+
+    
     
     await browser.close();
 })();
