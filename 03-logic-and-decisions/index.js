@@ -1,12 +1,19 @@
 const {chromium} = require("playwright");
 
+const bookToSearch = process.argv[2];
+
+if (!bookToSearch) {
+  console.log("❌ Please provide a book name");
+  process.exit(1);
+}
+
 (async () => {
     const browser = await chromium.launch({headless: true}),
         page = await browser.newPage();
 
     await page.goto("https://books.toscrape.com");
 
-    //We want to check for a book "When we collided" and get it's price, else click button next until book found
+    //We want to check for a book name and get it's price, else click button next until book found
 
     let bookFound = false;
         
@@ -20,7 +27,7 @@ const {chromium} = require("playwright");
 
             const title = await book.locator("h3 a").getAttribute("title");
 
-             if(title == "When We Collided"){
+             if(title.toLowerCase().includes(bookToSearch.toLowerCase())){//Dynamic user input
                 
                 const price = await book.locator(".price_color").innerText(),
                       buyLink = await book.locator("h3 a").getAttribute("href"),//get the relative href link
@@ -29,7 +36,7 @@ const {chromium} = require("playwright");
                 console.log("Book Found 😁");
                 console.log("Price: ", price);
                 console.log("Buy Now: ", fullLink);
-                
+
                 bookFound = true;
 
                 break;
