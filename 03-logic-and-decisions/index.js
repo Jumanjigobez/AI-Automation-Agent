@@ -11,9 +11,9 @@ if (!bookToSearch) {
     const browser = await chromium.launch({headless: true}),
         page = await browser.newPage();
 
-    await page.goto("https://books.toscrape.com");
+    await page.goto("https://books.toscrape.com"); //Website used
 
-    //We want to check for a book name and get it's price, else click button next until book found
+    //We want to check for a book name and get it's price and link, else click button next until book found
 
     let bookFound = false;
         
