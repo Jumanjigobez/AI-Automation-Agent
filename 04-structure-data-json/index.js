@@ -31,4 +31,5 @@ const {chromium} = require("playwright");
 
     console.log(booksData);
     await browser.close();
+    
 })();
