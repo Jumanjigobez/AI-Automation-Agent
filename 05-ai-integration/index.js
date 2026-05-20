@@ -21,6 +21,7 @@ const {chromium} = require("playwright");
     
     const books = await page.locator(".product_pod"),//array
           count = await books.count();
+          
     for(var i=0;i<count;i++){
         let book = books.nth(i),
             booksFound = {
@@ -44,9 +45,9 @@ const {chromium} = require("playwright");
         ${JSON.stringify(booksData, null, 2)}
 
         Task:
-        1. Pick the 3 best books for a beginner
+        1. Pick the 3 best books quickly for me that are the cheapest and have good covers based on the data provided.
         2. Explain why each is good
-        3. Keep response simple
+       
     `;
 
     const result = await ai.models.generateContent({
