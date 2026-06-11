@@ -8,7 +8,7 @@ if (!bookToSearch) {
 }
 
 (async () => {
-    const browser = await chromium.launch({headless: true}),
+    const browser = await chromium.launch({headless: false}),
         page = await browser.newPage();
 
     await page.goto("https://books.toscrape.com"); //Website used
