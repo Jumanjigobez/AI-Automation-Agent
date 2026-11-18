@@ -1,10 +1,15 @@
 
 
-(getCurrentTime = () =>{
-    return new Date().toLocaleTimeString();
-});
+const input = process.argv[2];
 
-const result = getCurrentTime();
 
-console.log(result);
+greetings = (n) =>{
+    const time =  new Date().toLocaleTimeString();
+    const name = !n ? "Friend" : n;
+    return `Hello ${name}! The current time is ${time}`;
+};
+
+const greet = greetings(input);
+
+console.log(greet);
 
