@@ -4,7 +4,8 @@ const { GoogleGenAI } = require("@google/genai");
 const tools = require("./tools");
 
 const ai = new GoogleGenAI({
-    apiKey: process.env.GEMINI_API_KEY
+    apiKey: process.env.AI_AUTOMATION_GEMINI_KEY,
+    apiVersion: "v1beta"
 });
 
 //Schema of the function tools for AI to understand
@@ -12,14 +13,20 @@ const functionDeclarations = [
     {
         name: "getCurrentTime",
         description: "Gets the current time",
-        parameters: "no parameters",
+        parameters: {
+            type: "OBJECT",
+            properties: {}
+        }
 
     },
 
     {
         name: "getCurrentDate",
         description: "Gets the current date",
-        parameters: "no parameters",
+       parameters: {
+            type: "OBJECT",
+            properties: {}
+        }
     },
 
     {
@@ -39,3 +46,26 @@ const functionDeclarations = [
     }
     
 ]
+
+
+const main = (async () => {
+
+    const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: "What time is it? Also greet Juma.",
+        config: {
+            tools: [{
+                functionDeclarations
+            }]
+        }
+    });
+
+    // console.log(response)
+
+    console.log("Function Calls:", response.functionCalls);
+    console.log("Text Response:", response.text);
+
+})
+
+main();
+
