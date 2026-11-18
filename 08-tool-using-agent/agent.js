@@ -47,12 +47,28 @@ const functionDeclarations = [
     
 ]
 
+const readline = require("readline");
+
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+const askUser = () => {
+    return new Promise((resolve) => {
+        rl.question("You: ", (answer) => {
+            resolve(answer);
+        });
+    });
+};
 
 const main = (async () => {
 
+    const userRequest = await askUser();//Get the user input prompt
+
     const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
-        contents: "What time is it? Also greet Juma.",
+        contents: userRequest,
         config: {
             tools: [{
                 functionDeclarations
@@ -103,7 +119,7 @@ const main = (async () => {
             {
                 role: "user",
                 parts: [
-                    { text: "What time is it? Also greet Juma." }
+                    { text: userRequest }
                 ]
             },
             response.candidates[0].content,
