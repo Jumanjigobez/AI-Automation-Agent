@@ -62,8 +62,66 @@ const main = (async () => {
 
     // console.log(response)
 
-    console.log("Function Calls:", response.functionCalls);
-    console.log("Text Response:", response.text);
+    // console.log("Function Calls:", response.functionCalls);
+    // console.log("Text Response:", response.text);
+
+    const functionCalls = response.functionCalls;
+    const functionResponses = [];
+
+    if (functionCalls) {
+        for (const call of functionCalls) {
+
+            const toolFunction = tools[call.name];
+
+            if (!toolFunction) {
+                console.log("Unknown tool:", call.name);
+                continue;
+            }
+
+            const result = toolFunction(call.args?.name);
+
+            // console.log("Tool executed:", call.name);
+            // console.log("Tool result:", result);
+
+            functionResponses.push({
+                
+                        functionResponse: {
+                        name: call.name,
+                        response: {
+                            result: result
+                        }
+                    }
+                }
+            )
+        }
+    }
+
+
+    const finalResponse = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: [
+            {
+                role: "user",
+                parts: [
+                    { text: "What time is it? Also greet Juma." }
+                ]
+            },
+            response.candidates[0].content,
+            {
+                role: "user",
+                parts: functionResponses
+            }
+        ],
+        config: {
+            config: {
+                tools: [{
+                    functionDeclarations
+                }]
+            }
+        }
+    });
+
+    console.log("Jumanji:", finalResponse.text);
 
 })
 
