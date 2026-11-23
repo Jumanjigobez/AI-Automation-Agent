@@ -66,25 +66,36 @@ const main = (async () => {
 
     let userRequest;//Get the user input prompt
     let response;
-   
+    let msgHistory = [];//This will store the conversation history, for agent to remember
     do{
         try{
             userRequest = await askUser();
+
+            msgHistory.push({
+                role: "user",
+                parts: [{text: userRequest}]
+            });
 
             if (userRequest.trim().toLowerCase() === "exit") {
                 console.log("Jumanji: Goodbye! 👋");
                 break;
             }
 
+            console.log("Conversation history:", JSON.stringify(msgHistory, null, 2));
+
             response = await ai.models.generateContent({
                 model: "gemini-2.5-flash",
-                contents: userRequest,
+                contents: msgHistory,
                 config: {
                     tools: [{
                         functionDeclarations
                     }]
                 }
             });
+
+            console.log("Gemini response:", JSON.stringify(response.candidates[0].content, null, 2));
+console.log("Gemini text:", response.text);
+console.log("Function calls:", response.functionCalls);
 
             const functionCalls = response.functionCalls;
             const functionResponses = [];
@@ -118,6 +129,13 @@ const main = (async () => {
             }
 
 
+            msgHistory.push(response.candidates[0].content);
+
+            msgHistory.push({
+                role: "user",
+                parts: functionResponses
+            });
+
             const finalResponse = await ai.models.generateContent({
                 model: "gemini-2.5-flash",
                 contents: [
@@ -142,7 +160,11 @@ const main = (async () => {
                 }
             });
 
+            msgHistory.push(finalResponse.candidates[0].content);
+
             console.log("Jumanji:", finalResponse.text);
+
+            // console.log(msgHistory)
     
         }catch(err){
             if(err.status === 429){
@@ -164,7 +186,6 @@ const main = (async () => {
     // console.log("Function Calls:", response.functionCalls);
     // console.log("Text Response:", response.text);
 
-    
 
 })
 
