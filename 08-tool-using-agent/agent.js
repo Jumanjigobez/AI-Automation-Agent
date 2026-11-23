@@ -93,14 +93,15 @@ const main = (async () => {
                 }
             });
 
-            console.log("Gemini response:", JSON.stringify(response.candidates[0].content, null, 2));
-console.log("Gemini text:", response.text);
-console.log("Function calls:", response.functionCalls);
+            // console.log("Gemini response:", JSON.stringify(response.candidates[0].content, null, 2));
+            // console.log("Gemini text:", response.text);
+            // console.log("Function calls:", response.functionCalls);
 
             const functionCalls = response.functionCalls;
             const functionResponses = [];
 
-            if (functionCalls) {
+            if (functionCalls && functionCalls.length > 0) {
+
                 for (const call of functionCalls) {
 
                     const toolFunction = tools[call.name];
@@ -126,45 +127,37 @@ console.log("Function calls:", response.functionCalls);
                         }
                     )
                 }
-            }
+            
 
 
-            msgHistory.push(response.candidates[0].content);
+                msgHistory.push(response.candidates[0].content);
 
-            msgHistory.push({
-                role: "user",
-                parts: functionResponses
-            });
+                msgHistory.push({
+                    role: "user",
+                    parts: functionResponses
+                });
 
-            const finalResponse = await ai.models.generateContent({
-                model: "gemini-2.5-flash",
-                contents: [
-                    {
-                        role: "user",
-                        parts: [
-                            { text: userRequest }
-                        ]
-                    },
-                    response.candidates[0].content,
-                    {
-                        role: "user",
-                        parts: functionResponses
+                const finalResponse = await ai.models.generateContent({
+                    model: "gemini-2.5-flash",
+                    contents: msgHistory,
+                    config: {
+                        
+                        tools: [{
+                            functionDeclarations
+                        }]
+                        
                     }
-                ],
-                config: {
-                    
-                    tools: [{
-                        functionDeclarations
-                    }]
-                    
-                }
-            });
+                });
 
-            msgHistory.push(finalResponse.candidates[0].content);
+                msgHistory.push(finalResponse.candidates[0].content);
 
-            console.log("Jumanji:", finalResponse.text);
+                console.log("Jumanji:", finalResponse.text);
 
-            // console.log(msgHistory)
+            }else{
+                msgHistory.push(response.candidates[0].content);
+
+                console.log("Jumanji:", response.text);
+            }
     
         }catch(err){
             if(err.status === 429){
